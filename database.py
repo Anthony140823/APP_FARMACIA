@@ -29,19 +29,27 @@ class Database:
     
     def execute_query(self, query, params=None, procedure=False):
         try:
-            cursor = self.connection.cursor(dictionary=True)
             if procedure:
+                cursor = self.connection.cursor()  # primero normal
                 if params:
                     cursor.callproc(query, params)
                 else:
                     cursor.callproc(query)
-
+    
                 result = []
                 for res in cursor.stored_results():
-                    result.extend(res.fetchall())
+                    # abrir un cursor con dictionary=True para leer
+                    dict_cursor = res._cursor
+                    dict_cursor._executed = res._executed
+                    rows = res.fetchall()
+                    # Convertir manualmente las tuplas en diccionarios
+                    col_names = [desc[0] for desc in res.description]
+                    for row in rows:
+                        result.append(dict(zip(col_names, row)))
                 cursor.close()
                 return result
             else:
+                cursor = self.connection.cursor(dictionary=True)
                 if params:
                     cursor.execute(query, params)
                 else:
@@ -49,11 +57,7 @@ class Database:
                 result = cursor.fetchall()
                 cursor.close()
                 return result
-        except Error as e:
-            print(f"❌ Error ejecutando consulta {query}: {e}")
-            st.error(f"Error en la consulta: {e}")
-            return None
-    
+        
     def execute_update(self, query, params=None, procedure=False):
         try:
             cursor = self.connection.cursor()
