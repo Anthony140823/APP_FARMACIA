@@ -3,6 +3,7 @@ from mysql.connector import Error
 import streamlit as st
 import bcrypt
 import json
+import os
 
 
 class Database:
@@ -13,11 +14,11 @@ class Database:
     def connect(self):
         try:
             self.connection = mysql.connector.connect(
-                host="localhost",          # Cambiar si despliegas en servidor
-                database="farmacia_db",    # Nombre de la BD
-                user="root",               # Usuario
-                password="admin",          # Contraseña
-                port=3306                  # Puerto MySQL
+                host=os.getenv("MYSQLHOST", "localhost"),
+                database=os.getenv("MYSQLDATABASE", "farmacia_db"),
+                user=os.getenv("MYSQLUSER", "root"),
+                password=os.getenv("MYSQLPASSWORD", "admin"),
+                port=int(os.getenv("MYSQLPORT", 3306))
             )
             if self.connection.is_connected():
                 db_info = self.connection.get_server_info()
