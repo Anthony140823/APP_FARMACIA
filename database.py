@@ -26,11 +26,11 @@ class Database:
         except Error as e:
             print(f"❌ Error al conectar a MySQL: {e}")
             st.error(f"Error de conexión a la base de datos: {e}")
-    
+
     def execute_query(self, query, params=None, procedure=False):
         try:
             if procedure:
-                cursor = self.connection.cursor()  # primero normal
+                cursor = self.connection.cursor()
                 if params:
                     cursor.callproc(query, params)
                 else:
@@ -38,11 +38,7 @@ class Database:
     
                 result = []
                 for res in cursor.stored_results():
-                    # abrir un cursor con dictionary=True para leer
-                    dict_cursor = res._cursor
-                    dict_cursor._executed = res._executed
                     rows = res.fetchall()
-                    # Convertir manualmente las tuplas en diccionarios
                     col_names = [desc[0] for desc in res.description]
                     for row in rows:
                         result.append(dict(zip(col_names, row)))
@@ -57,6 +53,10 @@ class Database:
                 result = cursor.fetchall()
                 cursor.close()
                 return result
+        except Error as e:
+            print(f"❌ Error ejecutando consulta {query}: {e}")
+            st.error(f"Error en la consulta: {e}")
+            return None
         
     def execute_update(self, query, params=None, procedure=False):
         try:
