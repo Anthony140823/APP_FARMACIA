@@ -14,10 +14,10 @@ class Database:
     def connect(self):
         try:
             self.connection = mysql.connector.connect(
-                host=os.getenv("MYSQLHOST", "localhost"),
-                database=os.getenv("MYSQLDATABASE", "farmacia_db"),
-                user=os.getenv("MYSQLUSER", "root"),
-                password=os.getenv("MYSQLPASSWORD", "admin"),
+                host=os.getenv("MYSQLHOST", "btkgltlwtqlihq6ytfh6-mysql.services.clever-cloud.com"),
+                database=os.getenv("MYSQLDATABASE", "btkgltlwtqlihq6ytfh6"),
+                user=os.getenv("MYSQLUSER", "upazlqy3bnwfzt9h"),
+                password=os.getenv("MYSQLPASSWORD", "tBmoYwbesqroW7Xf38PE"),
                 port=int(os.getenv("MYSQLPORT", 3306))
             )
             if self.connection.is_connected():
