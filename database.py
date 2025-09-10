@@ -14,8 +14,8 @@ class Database:
     def connect(self):
         try:
             self.connection = mysql.connector.connect(
-                host=os.getenv("MYSQLHOST", "btkgltlwtqlihq6ytfh6-mysql.services.clever-cloud.com"),
-                database=os.getenv("MYSQLDATABASE", "btkgltlwtqlihq6ytfh6"),
+                host=os.getenv("MYSQLHOST", "btkgltlwtq1ihq6ytfh6-mysql.services.clever-cloud.com"),
+                database=os.getenv("MYSQLDATABASE", "btkgltlwtq1ihq6ytfh6"),
                 user=os.getenv("MYSQLUSER", "upazlqy3bnwfzt9h"),
                 password=os.getenv("MYSQLPASSWORD", "tBmoYwbesqroW7Xf38PE"),
                 port=int(os.getenv("MYSQLPORT", 3306))
