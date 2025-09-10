@@ -226,27 +226,3 @@ def verificar_base_datos():
     except Exception as e:
         st.error(f"❌ Error verificando la base de datos: {e}")
         return False
-# -------------------------
-# Alertas de vencimiento
-# -------------------------
-def mostrar_alertas_vencimiento(db: Database):
-    st.subheader("📦 Alertas de vencimiento de medicamentos")
-
-    alertas = db.sp_alertas_vencimiento()
-
-    if not alertas:
-        st.success("✅ No hay medicamentos próximos a vencer.")
-        return
-
-    for alerta in alertas:
-        dias_restantes = alerta.get("dias_restantes", None)
-
-        if dias_restantes is None:
-            st.warning(f"{alerta['nombre']} (Lote {alerta['lote']}) no tiene fecha de vencimiento registrada.")
-        elif dias_restantes < 0:
-            st.error(f"⚠️ {alerta['nombre']} (Lote {alerta['lote']}) está VENCIDO hace {abs(dias_restantes)} días.")
-        elif dias_restantes == 0:
-            st.error(f"🚨 {alerta['nombre']} (Lote {alerta['lote']}) vence HOY.")
-        else:
-            st.info(f"⏳ {alerta['nombre']} (Lote {alerta['lote']}) vence en {dias_restantes} días.")
-
