@@ -3,6 +3,7 @@ from mysql.connector import Error
 import streamlit as st
 import bcrypt
 import json
+import os
 
 
 class Database:
@@ -13,11 +14,11 @@ class Database:
     def connect(self):
         try:
             self.connection = mysql.connector.connect(
-                host="localhost",          # Cambiar si despliegas en servidor
-                database="farmacia_db",    # Nombre de la BD
-                user="root",               # Usuario
-                password="admin",          # Contraseña
-                port=3306                  # Puerto MySQL
+                host=os.getenv("MYSQLHOST", "btkgltlwtq1ihq6ytfh6-mysql.services.clever-cloud.com"),
+                database=os.getenv("MYSQLDATABASE", "btkgltlwtq1ihq6ytfh6"),
+                user=os.getenv("MYSQLUSER", "upazlqy3bnwfzt9h"),
+                password=os.getenv("MYSQLPASSWORD", "tBmoYwbesqroW7Xf38PE"),
+                port=int(os.getenv("MYSQLPORT", 3306))
             )
             if self.connection.is_connected():
                 db_info = self.connection.get_server_info()
@@ -25,22 +26,26 @@ class Database:
         except Error as e:
             print(f"❌ Error al conectar a MySQL: {e}")
             st.error(f"Error de conexión a la base de datos: {e}")
-    
+
     def execute_query(self, query, params=None, procedure=False):
         try:
-            cursor = self.connection.cursor(dictionary=True)
             if procedure:
+                cursor = self.connection.cursor()
                 if params:
                     cursor.callproc(query, params)
                 else:
                     cursor.callproc(query)
-
+    
                 result = []
                 for res in cursor.stored_results():
-                    result.extend(res.fetchall())
+                    rows = res.fetchall()
+                    col_names = [desc[0] for desc in res.description]
+                    for row in rows:
+                        result.append(dict(zip(col_names, row)))
                 cursor.close()
                 return result
             else:
+                cursor = self.connection.cursor(dictionary=True)
                 if params:
                     cursor.execute(query, params)
                 else:
@@ -52,7 +57,7 @@ class Database:
             print(f"❌ Error ejecutando consulta {query}: {e}")
             st.error(f"Error en la consulta: {e}")
             return None
-    
+        
     def execute_update(self, query, params=None, procedure=False):
         try:
             cursor = self.connection.cursor()

@@ -126,11 +126,14 @@ def gestion_inventario():
         alertas_vencimiento = db.sp_alertas_vencimiento()
         if alertas_vencimiento:
             for alerta in alertas_vencimiento:
-                dias_restantes = alerta['dias_restantes']
-                if dias_restantes < 0:
-                    st.error(f"{alerta['nombre']} - Lote {alerta['lote']} VENCIDO el {alerta['fecha_vencimiento']}")
+                dias_restantes = alerta.get("dias_restantes", None)
+        
+                if dias_restantes is None:
+                    st.warning(f"{alerta['nombre']} - Lote {alerta['lote']} no tiene fecha de vencimiento registrada.")
+                elif dias_restantes < 0:
+                    st.error(f"⚠️ {alerta['nombre']} - Lote {alerta['lote']} VENCIDO el {alerta['fecha_vencimiento']}")
                 elif dias_restantes < 7:
-                    st.error(f"{alerta['nombre']} - Lote {alerta['lote']} vence en {dias_restantes} días")
+                    st.error(f"🚨 {alerta['nombre']} - Lote {alerta['lote']} vence en {dias_restantes} días")
                 elif dias_restantes < 30:
                     st.warning(f"{alerta['nombre']} - Lote {alerta['lote']} vence en {dias_restantes} días")
                 else:
